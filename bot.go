@@ -79,7 +79,7 @@ func (b *Bot) Run() {
 			ctx = AddBotToContext(ctx, b)
 			switch ev := msg.Data.(type) {
 			case *slack.ConnectedEvent:
-				fmt.Printf("Connected: %#v\n", ev.Info.User)
+				fmt.Printf("Connected: %#v, count: %d\n", ev.Info.User, ev.ConnectionCount)
 				b.setBotID(ev.Info.User.ID)
 			case *slack.MessageEvent:
 				// ignore messages from the current user, the bot user
@@ -97,7 +97,7 @@ func (b *Bot) Run() {
 				fmt.Printf("Error: %s\n", ev.Error())
 
 			case *slack.InvalidAuthEvent:
-				fmt.Printf("Invalid credentials")
+				fmt.Printf("Invalid credentials\n")
 				break
 
 			default:
@@ -114,14 +114,6 @@ func (b *Bot) Reply(evt *slack.MessageEvent, msg string, typing bool) {
 		b.Type(evt, msg)
 	}
 	b.RTM.SendMessage(b.RTM.NewOutgoingMessage(msg, evt.Channel))
-}
-
-// ReplyWithAttachments replys to a message event with a Slack Attachments message.
-func (b *Bot) ReplyWithAttachments(evt *slack.MessageEvent, attachments []slack.Attachment, typing bool) {
-	params := slack.PostMessageParameters{AsUser: true}
-	params.Attachments = attachments
-
-	b.Client.PostMessage(evt.Msg.Channel, "", params)
 }
 
 // Type sends a typing message and simulates delay (max 2000ms) based on message size.
