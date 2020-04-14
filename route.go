@@ -1,9 +1,8 @@
 package slackbot
 
 import (
+	"context"
 	"regexp"
-
-	"golang.org/x/net/context"
 )
 
 type Route struct {

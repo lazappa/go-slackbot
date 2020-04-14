@@ -1,9 +1,9 @@
 package slackbot
 
 import (
-	"golang.org/x/net/context"
+	"context"
 
-	"github.com/nlopes/slack"
+	"github.com/slack-go/slack"
 )
 
 type MessageType string
