@@ -72,6 +72,7 @@ type Bot struct {
 func (b *Bot) Run() {
 	b.RTM = b.Client.NewRTM()
 	go b.RTM.ManageConnection()
+	LOOP:
 	for {
 		select {
 		case msg := <-b.RTM.IncomingEvents:
@@ -84,7 +85,7 @@ func (b *Bot) Run() {
 			case *slack.MessageEvent:
 				// ignore messages from the current user, the bot user
 				if b.botUserID == ev.User {
-					continue
+					continue LOOP
 				}
 
 				ctx = AddMessageToContext(ctx, ev)
@@ -98,7 +99,7 @@ func (b *Bot) Run() {
 
 			case *slack.InvalidAuthEvent:
 				fmt.Printf("Invalid credentials\n")
-				break
+				break LOOP
 
 			default:
 				// Ignore other events..
