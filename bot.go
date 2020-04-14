@@ -72,7 +72,7 @@ type Bot struct {
 func (b *Bot) Run() {
 	b.RTM = b.Client.NewRTM()
 	go b.RTM.ManageConnection()
-	LOOP:
+LOOP:
 	for {
 		select {
 		case msg := <-b.RTM.IncomingEvents:
