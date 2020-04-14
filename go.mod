@@ -1,4 +1,4 @@
-module slackbot
+module github.com/lazappa/go-slackbot
 
 go 1.14
 
