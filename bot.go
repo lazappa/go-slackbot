@@ -94,12 +94,12 @@ LOOP:
 					match.Handler(ctx)
 				}
 
-			case *slack.RTMError:
-				fmt.Printf("Error: %s\n", ev.Error())
-
 			case *slack.InvalidAuthEvent:
 				fmt.Printf("Invalid credentials\n")
 				break LOOP
+
+			case error:
+				fmt.Printf("Error %T: %s\n", ev, ev.Error())
 
 			default:
 				// Ignore other events..
