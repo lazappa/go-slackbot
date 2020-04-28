@@ -117,9 +117,30 @@ func (b *Bot) Reply(evt *slack.MessageEvent, msg string, typing bool) {
 	b.RTM.SendMessage(b.RTM.NewOutgoingMessage(msg, evt.Channel))
 }
 
+// ReplyPost replies to a message event with a simple message using Slack API.
+func (b *Bot) ReplyPost(evt *slack.MessageEvent, msg string, typing bool) {
+	if typing {
+		b.Type(evt, msg)
+	}
+	postParams := slack.MsgOptionPostMessageParameters(slack.PostMessageParameters{
+		AsUser:    true,
+		Username:  b.BotUserID(),
+		LinkNames: 1,
+	})
+	_, _, _ = b.Client.PostMessage(evt.Channel, slack.MsgOptionText(msg, true), postParams)
+}
+
 // ReplyWithAttachments replys to a message event with a Slack Attachments message.
 func (b *Bot) ReplyWithAttachments(evt *slack.MessageEvent, attachments []slack.Attachment, typing bool) {
-	b.Client.PostMessage(evt.Msg.Channel, slack.MsgOptionAttachments(attachments...))
+	if typing {
+		b.Type(evt, "attachment")
+	}
+	postParams := slack.MsgOptionPostMessageParameters(slack.PostMessageParameters{
+		AsUser:    true,
+		Username:  b.botUserID,
+		LinkNames: 1,
+	})
+	_, _, _ = b.Client.PostMessage(evt.Msg.Channel, slack.MsgOptionAttachments(attachments...), postParams)
 }
 
 // Type sends a typing message and simulates delay (max 2000ms) based on message size.
