@@ -126,8 +126,10 @@ func (b *Bot) ReplyPost(evt *slack.MessageEvent, msg string, typing bool) {
 		AsUser:    true,
 		Username:  b.BotUserID(),
 		LinkNames: 1,
+		UnfurlLinks: true,
+		UnfurlMedia: true,
 	})
-	_, _, _ = b.Client.PostMessage(evt.Channel, slack.MsgOptionText(msg, true), postParams)
+	_, _, _ = b.Client.PostMessage(evt.Channel, slack.MsgOptionText(msg, false), postParams)
 }
 
 // ReplyWithAttachments replys to a message event with a Slack Attachments message.
