@@ -57,12 +57,15 @@ func New(slackToken string) *Bot {
 	return b
 }
 
+// Bot contains properties of the Slack bot
 type Bot struct {
 	SimpleRouter
 	// Routes to be matched, in order.
 	routes []*Route
 	// Slack UserID of the bot UserID
 	botUserID string
+	// Slack UserName of the bot UserName
+	botUserName string
 	// Slack API
 	Client *slack.Client
 	RTM    *slack.RTM
@@ -82,9 +85,11 @@ LOOP:
 			case *slack.ConnectedEvent:
 				fmt.Printf("Connected: %#v, count: %d\n", ev.Info.User, ev.ConnectionCount)
 				b.setBotID(ev.Info.User.ID)
+				b.setBotName(ev.Info.User.Name)
 			case *slack.MessageEvent:
 				// ignore messages from the current user, the bot user
-				if b.botUserID == ev.User {
+				// Slack likes to change if it's ID or Name
+				if b.botUserID == ev.User || b.botUserName == ev.User {
 					continue LOOP
 				}
 
@@ -158,13 +163,22 @@ func (b *Bot) Type(evt *slack.MessageEvent, msg interface{}) {
 	time.Sleep(sleepDuration)
 }
 
-// Fetch the botUserID.
+// BotUserID Fetch the botUserID.
 func (b *Bot) BotUserID() string {
 	return b.botUserID
 }
 
+// BotUserName Fetch the botUserName.
+func (b *Bot) BotUserName() string {
+	return b.botUserName
+}
+
 func (b *Bot) setBotID(ID string) {
 	b.botUserID = ID
+}
+
+func (b *Bot) setBotName(name string) {
+	b.botUserName = name
 }
 
 // msgLen gets lenght of message and attachment messages. Unsupported types return 0.
