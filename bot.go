@@ -89,7 +89,10 @@ LOOP:
 				b.botUserID = ev.Info.User.ID
 				b.botUserName = ev.Info.User.Name
 
-				u, _ := b.Client.GetUserInfo(ev.Info.User.ID)
+				u, err := b.Client.GetUserInfo(ev.Info.User.ID)
+				if err != nil {
+					fmt.Printf("Error getting bot info: %s\n", err)
+				}
 				b.botEnterpriseID = u.Enterprise.ID
 			case *slack.MessageEvent:
 				// ignore messages from the current user, the bot user
