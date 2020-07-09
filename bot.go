@@ -64,6 +64,8 @@ type Bot struct {
 	routes []*Route
 	// Slack UserID of the bot UserID
 	botUserID string
+	// Slack EnterpriseID of the bot EnterpriseID
+	botEnterpriseID string
 	// Slack UserName of the bot UserName
 	botUserName string
 	// Slack API
@@ -84,12 +86,16 @@ LOOP:
 			switch ev := msg.Data.(type) {
 			case *slack.ConnectedEvent:
 				fmt.Printf("Connected: %#v, count: %d\n", ev.Info.User, ev.ConnectionCount)
-				b.setBotID(ev.Info.User.ID)
-				b.setBotName(ev.Info.User.Name)
+				b.botUserID = ev.Info.User.ID
+				b.botUserName = ev.Info.User.Name
+
+				u, _ := b.Client.GetUserInfo(ev.Info.User.ID)
+				b.botEnterpriseID = u.Enterprise.ID
 			case *slack.MessageEvent:
 				// ignore messages from the current user, the bot user
-				// Slack likes to change if it's ID or Name
-				if b.botUserID == ev.User || b.botUserName == ev.User {
+				// for safety compare with enterprise ID, ID, and name
+				u := ev.User
+				if b.botEnterpriseID == u || b.botUserID == u || b.botUserName == u {
 					continue LOOP
 				}
 
@@ -168,20 +174,17 @@ func (b *Bot) BotUserID() string {
 	return b.botUserID
 }
 
+// BotUserID Fetch the botEnterpriseID.
+func (b *Bot) BotEnterpriseID() string {
+	return b.botEnterpriseID
+}
+
 // BotUserName Fetch the botUserName.
 func (b *Bot) BotUserName() string {
 	return b.botUserName
 }
 
-func (b *Bot) setBotID(ID string) {
-	b.botUserID = ID
-}
-
-func (b *Bot) setBotName(name string) {
-	b.botUserName = name
-}
-
-// msgLen gets lenght of message and attachment messages. Unsupported types return 0.
+// msgLen gets length of message and attachment messages. Unsupported types return 0.
 func msgLen(msg interface{}) (msgLen int) {
 	switch m := msg.(type) {
 	case string:
