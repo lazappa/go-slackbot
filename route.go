@@ -140,6 +140,7 @@ type TypesMatcher struct {
 }
 
 func (tm *TypesMatcher) Match(ctx context.Context) (bool, context.Context) {
+	bot := BotFromContext(ctx)
 	msg := MessageFromContext(ctx)
 	for _, t := range tm.types {
 		switch t {
@@ -148,7 +149,13 @@ func (tm *TypesMatcher) Match(ctx context.Context) (bool, context.Context) {
 				return true, ctx
 			}
 		case DirectMention:
-			if IsDirectMention(msg, tm.botUserID) {
+			if IsDirectMention(msg, bot.botUserID) {
+				return true, ctx
+			}
+			if IsDirectMention(msg, bot.botEnterpriseID) {
+				return true, ctx
+			}
+			if IsDirectMention(msg, bot.botUserName) {
 				return true, ctx
 			}
 		}
